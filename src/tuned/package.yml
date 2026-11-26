@@ -28,7 +28,7 @@ rundeps    :
     - python-pyudev
     - python3-dbus
 setup      : |
-    # TuneD does not include a ./configure script; this step can be left empty.
+    # TuneD does not include a ./configure script
 build      : |
     %make
 install    : |

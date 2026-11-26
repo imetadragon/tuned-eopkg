@@ -1,0 +1,78 @@
+# tuned/package.yml
+name       : tuned
+version    : '2.28.0'
+release    : 1
+source     :
+    - https://github.com/redhat-performance/tuned/archive/refs/tags/v2.28.0.tar.gz : e8fa0a3493dec60462a36082c9755c1f38ace89640dea816b0833d48d5df686b
+homepage   : https://tuned-project.org/
+license    : GPL-2.0-or-later
+component  : system.utils
+summary    : Daemon that performs monitoring and adaptive configuration of devices
+description: |
+    TuneD is a system tuning service for Linux. It can monitor system
+    components and dynamically tune system settings based on the selected
+    profile.
+conflicts  :
+    - power-profiles-daemon
+builddeps  :
+    - pkgconfig(systemd)
+    - python3-devel
+    - python-inotify
+    - desktop-file-utils
+rundeps    :
+    - python3
+    - python-inotify
+    - python-gobject
+    - libgtk-3
+    - polkit
+    - python-pyudev
+    - python3-dbus
+setup      : |
+    # TuneD does not include a ./configure script; this step can be left empty.
+build      : |
+    %make
+install    : |
+    %make_install
+
+    # Manually copy tuned-ppd files to the proper system paths
+    install -Dm 0755 tuned-ppd.py $installdir/usr/sbin/tuned-ppd
+    install -Dm 0644 tuned/ppd/tuned-ppd.service $installdir/usr/lib/systemd/system/tuned-ppd.service
+    install -Dm 0644 tuned/ppd/tuned-ppd.dbus.service $installdir/usr/share/dbus-1/system-services/org.freedesktop.UPower.PowerProfiles.service
+    install -Dm 0644 tuned/ppd/dbus.conf $installdir/usr/share/dbus-1/system.d/org.freedesktop.UPower.PowerProfiles.conf
+    install -Dm 0644 tuned/ppd/tuned-ppd.dbus.service $installdir/usr/share/dbus-1/system-services/net.hadess.PowerProfiles.service
+    install -Dm 0644 tuned/ppd/dbus.conf $installdir/usr/share/dbus-1/system.d/net.hadess.PowerProfiles.conf
+    install -Dm 0644 tuned/ppd/tuned-ppd.policy $installdir/usr/share/polkit-1/actions/org.freedesktop.UPower.PowerProfiles.policy
+    install -Dm 0644 tuned/ppd/ppd.conf $installdir/etc/tuned/ppd.conf
+
+    # Replace ?name? placeholders in D-Bus and Polkit templates with actual service names
+    sed -i 's/?name?/org.freedesktop.UPower.PowerProfiles/g' $installdir/usr/share/dbus-1/system-services/org.freedesktop.UPower.PowerProfiles.service
+    sed -i 's/?name?/org.freedesktop.UPower.PowerProfiles/g' $installdir/usr/share/dbus-1/system.d/org.freedesktop.UPower.PowerProfiles.conf
+    sed -i 's/?name?/net.hadess.PowerProfiles/g' $installdir/usr/share/dbus-1/system-services/net.hadess.PowerProfiles.service
+    sed -i 's/?name?/net.hadess.PowerProfiles/g' $installdir/usr/share/dbus-1/system.d/net.hadess.PowerProfiles.conf
+    sed -i 's/?name?/org.freedesktop.UPower.PowerProfiles/g' $installdir/usr/share/polkit-1/actions/org.freedesktop.UPower.PowerProfiles.policy
+
+    # Symlink systemd wants units so services start automatically after installation
+    install -d $installdir/usr/lib/systemd/system/multi-user.target.wants
+    install -d $installdir/usr/lib/systemd/system/graphical.target.wants
+    ln -sf /usr/lib/systemd/system/tuned.service $installdir/usr/lib/systemd/system/multi-user.target.wants/tuned.service
+    ln -sf /usr/lib/systemd/system/tuned-ppd.service $installdir/usr/lib/systemd/system/graphical.target.wants/tuned-ppd.service
+packages   :
+    - tuned-ppd:
+        summary    : Drop-in replacement for power-profiles-daemon
+        description: |
+            Daemon that allows applications to easily transition to TuneD
+            from power-profiles-daemon (PPD).
+        rundeps    :
+            - tuned
+        conflicts  :
+            - power-profiles-daemon
+        paths      :
+            - /usr/sbin/tuned-ppd
+            - /usr/lib/systemd/system/tuned-ppd.service
+            - /usr/lib/systemd/system/graphical.target.wants/tuned-ppd.service
+            - /usr/share/dbus-1/system.d/org.freedesktop.UPower.PowerProfiles.conf
+            - /usr/share/dbus-1/system-services/org.freedesktop.UPower.PowerProfiles.service
+            - /usr/share/dbus-1/system.d/net.hadess.PowerProfiles.conf
+            - /usr/share/dbus-1/system-services/net.hadess.PowerProfiles.service
+            - /usr/share/polkit-1/actions/org.freedesktop.UPower.PowerProfiles.policy
+            - /etc/tuned/ppd.conf

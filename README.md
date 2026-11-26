@@ -4,7 +4,7 @@ Solus packaging recipe (`package.yml`) for `tuned` and `tuned-ppd`, providing sy
 
 ## Installation
 
-1. Go to the **Releases** section of this repository and download the `.eopkg` packages for **`python-linux-procfs`** and **`tuned`** (along with **`tuned-ppd`** if provided as a separate package in the release).
+1. Go to the **Releases** section of this repository and download the `.eopkg` packages for **`python-linux-procfs`** and **`tuned`**.
 2. Install **`python-linux-procfs`** first, then install **`tuned`**:
 
    ```bash
@@ -16,6 +16,10 @@ Solus packaging recipe (`package.yml`) for `tuned` and `tuned-ppd`, providing sy
 
    ```bash
    sudo reboot
+   ```
+4. Check status
+   ```bash
+   sudo systemctl status tuned.service
    ```
 
 ## Uninstallation

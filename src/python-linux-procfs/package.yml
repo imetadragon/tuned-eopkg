@@ -1,0 +1,28 @@
+# python-linux-procfs/package.yml
+name       : python-linux-procfs
+version    : '0.7.4'
+release    : 1
+source     :
+    - git|https://git.kernel.org/pub/scm/libs/python/python-linux-procfs/python-linux-procfs.git : main
+homepage   : https://git.kernel.org/pub/scm/libs/python/python-linux-procfs/python-linux-procfs.git
+license    : GPL-2.0-only
+component  : programming.python
+summary    : Python classes to extract information from the Linux kernel /proc files
+description: |
+    Python library that provides abstractions to extract information from
+    the Linux kernel /proc filesystem.
+builddeps  :
+    - python3-devel
+    - python-build
+    - python-setuptools
+    - python-wheel
+    - python-installer
+    - pkgconf
+rundeps    :
+    - python3
+setup      : |
+    %python3_setup
+build      : |
+    %python3_setup        # <-- Düzeltildi: %python3_build yerine
+install    : |
+    %python3_install

@@ -23,6 +23,6 @@ rundeps    :
 setup      : |
     %python3_setup
 build      : |
-    %python3_setup        # <-- Düzeltildi: %python3_build yerine
+    %python3_setup
 install    : |
     %python3_install
